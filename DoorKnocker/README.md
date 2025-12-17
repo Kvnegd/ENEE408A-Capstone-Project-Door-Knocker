@@ -1,8 +1,8 @@
-#**Door Knocker** 
+# **Door Knocker** 
 
 Smart Knock Detection & Mobile Control System
 
-##**Overview**
+## **Overview**
 
 Door Knocker is an embedded “smart door” system that detects, localizes, and classifies physical knocks using piezoelectric sensors and real-time signal processing. Instead of buttons or touch input, the system interprets vibration patterns on a door to determine where and how a knock occurred.
 
@@ -14,7 +14,7 @@ A mobile app for configuration, visualization, and interaction
 
 Together, these components form a complete knock-based access and monitoring platform.
 
-##**How It Works**
+## **How It Works**
 
 Piezoelectric sensors mounted on the door convert knocks into electrical signals
 
@@ -28,8 +28,8 @@ Mobile app displays data and allows system configuration
 
 The system is designed to be robust against noise and structural vibrations while remaining efficient enough for real-time embedded operation.
 
-##**Features**
-###**Embedded System**
+## **Features**
+### **Embedded System**
 
 Multi-sensor knock detection using piezo discs
 
@@ -41,7 +41,7 @@ Zone-based knock localization
 
 Modular firmware architecture for easy extension
 
-###**Mobile Application**
+### **Mobile Application**
 
 Configure thresholds, sensitivity, and zones
 
@@ -53,7 +53,7 @@ Monitor system status and recent events
 
 Designed for future expansion (logging, notifications, actuator control)
 
-##**Use Cases**
+## **Use Cases**
 
 Knock-based access control systems
 
@@ -63,7 +63,7 @@ Embedded signal-processing experimentation
 
 Educational projects involving ADCs, sensors, and real-time DSP
 
-##**Project Goals**
+## **Project Goals**
 
 *Build a reliable knock detection and localization pipeline
 
