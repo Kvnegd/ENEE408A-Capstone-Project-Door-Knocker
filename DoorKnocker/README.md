@@ -1,4 +1,4 @@
-**Door Knocker – Smart Knock Detection & Mobile Control System**
+******Door Knocker – Smart Knock Detection & Mobile Control System******
 Overview
 
 The Door Knocker project is a smart, sensor-driven access interface that detects, localizes, and classifies physical knocks on a door using piezoelectric sensors, embedded signal processing, and a companion mobile application. The system is designed as a low-cost, non-intrusive alternative to traditional keypads or touch-based access systems, leveraging vibration analysis to identify where and how a door is struck.
@@ -71,4 +71,4 @@ Embedded firmware: Microcontroller code handling ADC sampling, signal processing
 
 Mobile app: Source code for the companion application used for configuration and monitoring
 
-Documentation: Design notes, system diagrams, and project-related resources
+
