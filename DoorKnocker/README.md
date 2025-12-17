@@ -8,9 +8,9 @@ Door Knocker is an embedded “smart door” system that detects, localizes, and
 
 The project combines:
 
-Embedded firmware for knock detection and localization
+* Embedded firmware for knock detection and localization
 
-A mobile app for configuration, visualization, and interaction
+* A mobile app for configuration, visualization, and interaction
 
 Together, these components form a complete knock-based access and monitoring platform.
 
@@ -31,44 +31,42 @@ The system is designed to be robust against noise and structural vibrations whil
 ## **Features**
 ### **Embedded System**
 
-Multi-sensor knock detection using piezo discs
+* Multi-sensor knock detection using piezo discs
 
-Simultaneous ADC sampling for accurate comparison
+* Simultaneous ADC sampling for accurate comparison
 
-Real-time amplitude and timing analysis
+* Real-time amplitude and timing analysis
 
-Zone-based knock localization
+* Zone-based knock localization
 
-Modular firmware architecture for easy extension
+* Modular firmware architecture for easy extension
 
 ### **Mobile Application**
 
-Configure thresholds, sensitivity, and zones
+* Visualize knock activity and sensor responses
 
-Visualize knock activity and sensor responses
+* Manage knock patterns for access control
 
-Manage knock patterns for access control
+* Monitor system status and recent events
 
-Monitor system status and recent events
-
-Designed for future expansion (logging, notifications, actuator control)
+~ Designed for future expansion (logging, notifications, actuator control)
 
 ## **Use Cases**
 
-Knock-based access control systems
+* Knock-based access control systems
 
-Smart doors without touch interfaces
+* Smart doors without touch interfaces
 
-Embedded signal-processing experimentation
+* Embedded signal-processing experimentation
 
-Educational projects involving ADCs, sensors, and real-time DSP
+* Educational projects involving ADCs, sensors, and real-time DSP
 
 ## **Project Goals**
 
-*Build a reliable knock detection and localization pipeline
+* Build a reliable knock detection and localization pipeline
 
-*Integrate embedded firmware with a modern mobile UI
+* Integrate embedded firmware with a modern mobile UI
 
-*Emphasize clean, modular, and extensible design
+* Emphasize clean, modular, and extensible design
 
-*Apply real-time signal processing in a practical system
+* Apply real-time signal processing in a practical system
