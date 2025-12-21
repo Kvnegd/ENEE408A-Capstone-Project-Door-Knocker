@@ -1,72 +1,66 @@
-# **Door Knocker** 
+# DoorKnocker
 
-Smart Knock Detection & Mobile Control System
+DoorKnocker is a smart door-knock access system that pairs embedded signal processing with a mobile app. The embedded node detects knocks, localizes which side of the door was hit, and classifies patterns. The app renders a live door view, confirms the knock sequence in real time, and sends an unlock command when a valid code is received.
 
-## **Overview**
+## Project overview
 
-Door Knocker is an embedded “smart door” system that detects, localizes, and classifies physical knocks using piezoelectric sensors and real-time signal processing. Instead of buttons or touch input, the system interprets vibration patterns on a door to determine where and how a knock occurred.
+This project implements an embedded "smart door knocker" system that detects, localizes, and classifies knocks on a door using piezoelectric sensors and a microcontroller-based signal-processing pipeline. Multiple sensors are sampled via synchronized ADC channels, and the resulting vibration signals are analyzed in real time to estimate knock amplitude and relative timing, enabling the system to determine which region of the door was struck and whether the knock pattern matches a predefined access sequence. The design emphasizes robust detection under noise, efficient fixed-point/embedded processing, and a modular firmware architecture that can be extended to drive actuators (e.g., an electronic lock) or integrate with higher-level access-control and logging systems.
 
-The project combines:
+## Mobile app
 
-* Embedded firmware for knock detection and localization
+The app is built with Expo and React Native. It connects to an HC-05 Bluetooth module and translates incoming data into left/right knocks. Key features include:
 
-* A mobile app for configuration, visualization, and interaction
+- Live door visualization with directional ripple and knock animations.
+- Knock sequence progress and feedback for valid or invalid patterns.
+- Quick reset and simulated knocks for testing without hardware.
+- Bluetooth connection management, status, and debug log view.
+- Unlock command signaling when a valid pattern is detected.
 
-Together, these components form a complete knock-based access and monitoring platform.
+Current patterns are four knocks long with two valid codes (Kevin and Danny). Patterns can be adjusted in `hooks/useKnockPattern.ts`.
 
-## **How It Works**
+## Communication flow
 
-Piezoelectric sensors mounted on the door convert knocks into electrical signals
+1) STM32 detects a knock and determines the door zone (left or right).
+2) STM32 sends `1` (left) or `2` (right) over the HC-05.
+3) The app parses the message, updates the door UI, and appends the knock to the sequence.
+4) When a valid sequence is matched, the app sends an unlock payload back to the device.
 
-Synchronized ADC sampling captures vibration data from multiple sensors
+## Local development
 
-Embedded signal processing extracts features such as amplitude and relative timing
+Install dependencies:
 
-Classification logic determines the knock location (zone) and pattern
+```bash
+npm install
+```
 
-Mobile app displays data and allows system configuration
+Start Metro:
 
-The system is designed to be robust against noise and structural vibrations while remaining efficient enough for real-time embedded operation.
+```bash
+npx expo start
+```
 
-## **Features**
-### **Embedded System**
+Note: Classic Bluetooth requires a development build (Expo Go does not include native modules). Build a dev client or run a native build:
 
-* Multi-sensor knock detection using piezo discs
+```bash
+eas build --profile development --platform android
+```
 
-* Simultaneous ADC sampling for accurate comparison
+## Repository structure (high level)
 
-* Real-time amplitude and timing analysis
+- `app/` - Expo Router screens (Live and Setup tabs).
+- `hooks/` - Knock pattern logic and Bluetooth interface.
+- `components/` - UI building blocks.
+- `assets/` - App images and static resources.
 
-* Zone-based knock localization
+## Config notes
 
-* Modular firmware architecture for easy extension
+- Bluetooth parsing is implemented in `hooks/useHc05Bluetooth.ts`.
+- Knock pattern matching is defined in `hooks/useKnockPattern.ts`.
+- Unlock payload format can be changed in `hooks/useHc05Bluetooth.ts`.
 
-### **Mobile Application**
+## Future extensions
 
-* Visualize knock activity and sensor responses
-
-* Manage knock patterns for access control
-
-* Monitor system status and recent events
-
-~ Designed for future expansion (logging, notifications, actuator control)
-
-## **Use Cases**
-
-* Knock-based access control systems
-
-* Smart doors without touch interfaces
-
-* Embedded signal-processing experimentation
-
-* Educational projects involving ADCs, sensors, and real-time DSP
-
-## **Project Goals**
-
-* Build a reliable knock detection and localization pipeline
-
-* Integrate embedded firmware with a modern mobile UI
-
-* Emphasize clean, modular, and extensible design
-
-* Apply real-time signal processing in a practical system
+- Dynamic pattern enrollment from the app.
+- User profiles, audit logs, and access history.
+- Actuator control and safe fallback modes.
+- On-device calibration for different door materials and sensor placements.
