@@ -1,18 +1,21 @@
-Door Knocker
+# **Door Knocker** 
+
 Smart Knock Detection & Mobile Control System
 
-Overview
+## **Overview**
+
 Door Knocker is an embedded “smart door” system that detects, localizes, and classifies physical knocks using piezoelectric sensors and real-time signal processing. Instead of buttons or touch input, the system interprets vibration patterns on a door to determine where and how a knock occurred.
 
 The project combines:
 
-Embedded firmware for knock detection and localization
+* Embedded firmware for knock detection and localization
 
-A mobile app for configuration, visualization, and interaction
+* A mobile app for configuration, visualization, and interaction
 
 Together, these components form a complete knock-based access and monitoring platform.
 
-How It Works
+## **How It Works**
+
 Piezoelectric sensors mounted on the door convert knocks into electrical signals
 
 Synchronized ADC sampling captures vibration data from multiple sensors
@@ -25,41 +28,45 @@ Mobile app displays data and allows system configuration
 
 The system is designed to be robust against noise and structural vibrations while remaining efficient enough for real-time embedded operation.
 
-Features
-Embedded System
-Multi-sensor knock detection using piezo discs
+## **Features**
+### **Embedded System**
 
-Simultaneous ADC sampling for accurate comparison
+* Multi-sensor knock detection using piezo discs
 
-Real-time amplitude and timing analysis
+* Simultaneous ADC sampling for accurate comparison
 
-Zone-based knock localization
+* Real-time amplitude and timing analysis
 
-Modular firmware architecture for easy extension
+* Zone-based knock localization
 
-Mobile Application
-Visualize knock activity and sensor responses
+* Modular firmware architecture for easy extension
 
-Manage knock patterns for access control
+### **Mobile Application**
 
-Monitor system status and recent events
+* Visualize knock activity and sensor responses
+
+* Manage knock patterns for access control
+
+* Monitor system status and recent events
 
 ~ Designed for future expansion (logging, notifications, actuator control)
 
-Use Cases
-Knock-based access control systems
+## **Use Cases**
 
-Smart doors without touch interfaces
+* Knock-based access control systems
 
-Embedded signal-processing experimentation
+* Smart doors without touch interfaces
 
-Educational projects involving ADCs, sensors, and real-time DSP
+* Embedded signal-processing experimentation
 
-Project Goals
-Build a reliable knock detection and localization pipeline
+* Educational projects involving ADCs, sensors, and real-time DSP
 
-Integrate embedded firmware with a modern mobile UI
+## **Project Goals**
 
-Emphasize clean, modular, and extensible design
+* Build a reliable knock detection and localization pipeline
 
-Apply real-time signal processing in a practical system
+* Integrate embedded firmware with a modern mobile UI
+
+* Emphasize clean, modular, and extensible design
+
+* Apply real-time signal processing in a practical system
