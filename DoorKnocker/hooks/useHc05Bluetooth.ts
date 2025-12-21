@@ -35,8 +35,8 @@ const bluetooth = (() => {
 
 function parseZone(raw: string): KnockZone | undefined {
   const normalized = raw.trim().toLowerCase();
-  if (normalized.startsWith('l')) return 'L';
-  if (normalized.startsWith('r')) return 'R';
+  if (normalized.startsWith('l') || normalized === '1') return 'L';
+  if (normalized.startsWith('r') || normalized === '2') return 'R';
   return undefined;
 }
 

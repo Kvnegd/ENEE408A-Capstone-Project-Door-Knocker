@@ -1,4 +1,5 @@
-﻿import { useEffect, useMemo, useRef, useState } from 'react';
+import { Audio } from 'expo-audio';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
@@ -13,25 +14,21 @@ type LogEntry = {
   timestamp: number;
 };
 
-function KnockWave({
-  active,
-  align,
-}: {
-  active: boolean;
-  align: 'flex-start' | 'flex-end';
-}) {
+function KnockWave({ trigger, align }: { trigger: number; align: 'flex-start' | 'flex-end' }) {
   const scale = useRef(new Animated.Value(0)).current;
   const opacity = useRef(new Animated.Value(0)).current;
+  const prev = useRef(trigger);
 
   useEffect(() => {
-    if (!active) return;
+    if (trigger === prev.current) return;
+    prev.current = trigger;
     scale.setValue(0);
-    opacity.setValue(0.8);
+    opacity.setValue(0.9);
     Animated.parallel([
-      Animated.timing(scale, { toValue: 1, duration: 450, useNativeDriver: true }),
-      Animated.timing(opacity, { toValue: 0, duration: 450, useNativeDriver: true }),
+      Animated.timing(scale, { toValue: 1, duration: 520, useNativeDriver: true }),
+      Animated.timing(opacity, { toValue: 0, duration: 520, useNativeDriver: true }),
     ]).start();
-  }, [active, opacity, scale]);
+  }, [trigger, opacity, scale]);
 
   return (
     <Animated.View
@@ -86,8 +83,34 @@ export default function HomeScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const [log, setLog] = useState<LogEntry[]>([]);
-  const [lastKnock, setLastKnock] = useState<KnockZone | null>(null);
+  const [lastKnock, setLastKnock] = useState<{ zone: KnockZone; tick: number } | null>(null);
+  const [leftTick, setLeftTick] = useState(0);
+  const [rightTick, setRightTick] = useState(0);
+  const doorPulse = useRef(new Animated.Value(0)).current;
+  const doorTilt = useRef(new Animated.Value(0)).current;
+  const knockSound = useRef<Audio.Sound | null>(null);
   const logId = useRef(0);
+
+  const KNOCK_SOUND_URL = 'https://actions.google.com/sounds/v1/impacts/wood_plank_flicks.ogg';
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const { sound } = await Audio.Sound.createAsync({ uri: KNOCK_SOUND_URL });
+        knockSound.current = sound;
+      } catch {
+        // ignore sound load failure
+      }
+    })();
+    return () => {
+      knockSound.current?.unloadAsync?.();
+    };
+  }, []);
+
+  const playKnockSound = useCallback(() => {
+    knockSound.current?.replayAsync?.().catch(() => {});
+  }, []);
+
   const { sequence, match, progress, registerKnock, reset } = useKnockPattern((code) => {
     sendUnlockSignal(code);
     setLog((entries) => {
@@ -111,7 +134,11 @@ export default function HomeScreen() {
     sendUnlockSignal,
   } = useHc05Bluetooth((zone) => {
     registerKnock(zone, 'bluetooth');
-    setLastKnock(zone);
+    const tick = Date.now();
+    setLastKnock({ zone, tick });
+    if (zone === 'L') setLeftTick((t) => t + 1);
+    if (zone === 'R') setRightTick((t) => t + 1);
+    playKnockSound();
     setLog((entries) => {
       const nextId = logId.current + 1;
       logId.current = nextId;
@@ -124,7 +151,11 @@ export default function HomeScreen() {
 
   const handleSimulatedKnock = (zone: KnockZone) => {
     registerKnock(zone, 'simulated');
-    setLastKnock(zone);
+    const tick = Date.now();
+    setLastKnock({ zone, tick });
+    if (zone === 'L') setLeftTick((t) => t + 1);
+    if (zone === 'R') setRightTick((t) => t + 1);
+    playKnockSound();
     setLog((entries) => {
       const nextId = logId.current + 1;
       logId.current = nextId;
@@ -134,11 +165,33 @@ export default function HomeScreen() {
       ];
     });
   };
+
   const matchLabel = useMemo(() => {
     if (match.status === 'matched') return `${match.codeName.toUpperCase()} unlocked`;
     if (match.status === 'invalid') return 'Invalid pattern — start again';
     return 'Listening for 4 knocks';
   }, [match]);
+
+  useEffect(() => {
+    if (!lastKnock) return;
+    doorPulse.setValue(0);
+    Animated.sequence([
+      Animated.timing(doorPulse, { toValue: 1, duration: 200, useNativeDriver: true }),
+      Animated.timing(doorPulse, { toValue: 0, duration: 240, useNativeDriver: true }),
+    ]).start();
+
+    const direction = lastKnock.zone === 'L' ? -1 : 1;
+    doorTilt.setValue(0);
+    Animated.sequence([
+      Animated.timing(doorTilt, { toValue: 8 * direction, duration: 120, useNativeDriver: true }),
+      Animated.spring(doorTilt, {
+        toValue: 0,
+        friction: 5,
+        tension: 70,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [doorPulse, lastKnock, doorTilt]);
 
   const resetSequence = () => {
     reset();
@@ -198,15 +251,44 @@ export default function HomeScreen() {
             </Pressable>
           </View>
 
-          <View style={styles.doorShell}>
-            <KnockWave active={lastKnock === 'L'} align="flex-start" />
+          <Animated.View
+            style={[
+              styles.doorShell,
+              {
+                transform: [
+                  {
+                    translateX: doorTilt.interpolate({
+                      inputRange: [-12, 12],
+                      outputRange: [-10, 10],
+                    }),
+                  },
+                  {
+                    rotate: doorTilt.interpolate({
+                      inputRange: [-12, 12],
+                      outputRange: ['-6deg', '6deg'],
+                    }),
+                  },
+                  {
+                    scale: doorPulse.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [1, 1.08],
+                    }),
+                  },
+                ],
+                shadowOpacity: doorPulse.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0.18, 0.34],
+                }),
+              },
+            ]}>
+            <KnockWave trigger={leftTick} align="flex-start" />
             <View style={styles.door}>
               <View style={styles.doorLeft} />
               <View style={styles.doorRight} />
               <View style={styles.knob} />
             </View>
-            <KnockWave active={lastKnock === 'R'} align="flex-end" />
-          </View>
+            <KnockWave trigger={rightTick} align="flex-end" />
+          </Animated.View>
 
           <View style={styles.sequenceRow}>
             {new Array(4).fill(null).map((_, idx) => (
@@ -277,8 +359,8 @@ export default function HomeScreen() {
             )}
           </View>
           <ThemedText style={styles.muted}>
-            Pair the HC-05 in system settings first. Incoming messages are parsed as left (L) or
-            right (R) knocks.
+            Pair the HC-05 in system settings first. Incoming messages are parsed as left (1/L) or
+            right (2/R) knocks.
           </ThemedText>
           {lastMessage && (
             <View style={styles.rowSpread}>
@@ -426,6 +508,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#1c1f23',
     borderRadius: 18,
     padding: 18,
+    shadowColor: '#000',
+    shadowOpacity: 0.18,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 8,
   },
   door: {
     height: 240,
@@ -458,13 +545,13 @@ const styles = StyleSheet.create({
   wave: {
     position: 'absolute',
     top: '50%',
-    marginTop: -40,
-    width: 80,
-    height: 80,
-    borderRadius: 80,
-    borderWidth: 2,
+    marginTop: -55,
+    width: 140,
+    height: 140,
+    borderRadius: 140,
+    borderWidth: 4,
     borderColor: '#7cc8ff',
-    backgroundColor: 'rgba(124,200,255,0.1)',
+    backgroundColor: 'rgba(124,200,255,0.22)',
   },
   sequenceRow: {
     flexDirection: 'row',
